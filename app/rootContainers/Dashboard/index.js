@@ -1,16 +1,13 @@
 import React, {
-  useEffect,
-  useState,
   lazy
 } from 'react'
 import styled from 'styled-components'
-import cx from 'classnames'
-import { Switch, Redirect } from 'react-router-dom'
+import { Switch } from 'react-router-dom'
 
 import RouteWithSubroutes from 'Components/RouteWithSubRoutes'
 
-import NavHead from './components/NavHead.js'
 import Context from './context'
+import MainNav from './components/MainNav'
 
 const Container = styled.div`
   height: 100vh;
@@ -20,64 +17,39 @@ const Container = styled.div`
   }
 `
 
-const LoadDashboard = lazy(() => import('Containers/Dashboard' /* webpackChunkName: "Containers-Dashboard" */))
+const LoadHome = lazy(() => import('Containers/Home' /* webpackChunkName: "Containers-Dashboard" */))
+
+const LoadHistory = lazy(() => import('Containers/History' /* webpackChunkName: "Containers-History" */))
+
+const LoadStats = lazy(() => import('Containers/Stats' /* webpackChunkName: "Containers-Stats" */))
 
 const DashboardRoot = ({ routes, match, history }) => {
   const { isExact, path } = match
-  const [profile, setProfile] = useState({
-    name: null,
-    role: null
-  })
-  const classNames = cx(
-    'content',
-    'l-fg-1',
-    { 'l-ai-cen': isExact && (path === '/dashboard') },
-    { 'l-jc-cen': isExact && path === '/dashboard' },
-    { 'l-d-f': isExact && path === '/dashboard' }
-  )
-
-  useEffect(() => {
-    const firstName = localStorage.getItem('firstName')
-    const lastName = localStorage.getItem('lastName')
-    const role = localStorage.getItem('role')
-
-    setProfile({
-      name: `${firstName} ${lastName}`,
-      role
-    })
-  }, [])
-
   return (
-    <Context.Provider value={{ history, profile }}>
+    <Context.Provider value={{ history }}>
       <Container className='l-d-f l-fd-col'>
-        <NavHead />
-        <div className={classNames}>
+        <MainNav />
+        <div className='l-fg-1 content'>
           {
-            isExact && path === '/dashboard' &&
-              <LoadDashboard />
+            isExact && path === '/' &&
+              <LoadHome />
           }
           {
-            isExact && path === '/organizations' &&
-              <Redirect
-                to='/organizations/list'
-              />
+            isExact && path === '/history' &&
+              <LoadHistory />
           }
           {
-            isExact && path === '/users' &&
-              <Redirect
-                to='/users/list'
-              />
-          }
-          {
-            isExact && path === '/employees' &&
-              <Redirect
-                to='/employees/list'
-              />
+            isExact && path === '/stats' &&
+              <LoadStats />
           }
           {
             !isExact &&
               <Switch>
-                {routes.map((r, i) => <RouteWithSubroutes key={i} {...r} />)}
+                {
+                  routes.map((r, i) => (
+                    <RouteWithSubroutes {...r} key={i} />
+                  ))
+                }
               </Switch>
           }
         </div>
