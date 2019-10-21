@@ -1,10 +1,10 @@
-import React, {
-  lazy
-} from 'react'
+import React, { lazy, useEffect } from 'react'
 import styled from 'styled-components'
+import { useDispatch } from 'react-redux'
 import { Switch } from 'react-router-dom'
 
 import RouteWithSubroutes from 'Components/RouteWithSubRoutes'
+import { SET_ITEM_ACTION } from 'App/appReducer'
 
 import Context from './context'
 import MainNav from './components/MainNav'
@@ -25,6 +25,15 @@ const LoadStats = lazy(() => import('Containers/Stats' /* webpackChunkName: "Con
 
 const DashboardRoot = ({ routes, match, history }) => {
   const { isExact, path } = match
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    const lsBudget = localStorage.getItem('budget')
+    if (lsBudget) {
+      dispatch(SET_ITEM_ACTION(JSON.parse(lsBudget)))
+    }
+  }, [])
+
   return (
     <Context.Provider value={{ history }}>
       <Container className='l-d-f l-fd-col'>
