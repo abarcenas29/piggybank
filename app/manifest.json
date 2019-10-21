@@ -3,7 +3,7 @@
   "short_name": "PUPP",
   "theme_color": "#800600",
   "background_color": "#800600",
-  "display": "browser",
+  "display": "standalone",
   "Scope": "/",
   "start_url": "/",
   "icons": [
