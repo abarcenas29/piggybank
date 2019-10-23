@@ -1,12 +1,15 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
+import dayjs from 'dayjs'
 import { createStructuredSelector } from 'reselect'
 import { Form as ReactFinalForm, Field, FormSpy } from 'react-final-form'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   Button,
   Segment,
-  Statistic
+  Statistic,
+  Modal,
+  Message
 } from 'semantic-ui-react'
 
 import {
@@ -29,6 +32,8 @@ const Input = styled.input`
 
 const Home = () => {
   const dispatch = useDispatch()
+  const [showCategoryModal, setShowCategoryModal] = useState(false)
+  const [isAuthorised, setIsAuthorised] = useState(false)
   const { totalIncome, totalExpense } = useSelector(
     createStructuredSelector({
       totalIncome: getTotalIncomeSelector(),
@@ -41,8 +46,20 @@ const Home = () => {
   }
 
   return (
-    <Container className='l-d-f l-fd-col'>
-      <Segment className='l-d-f l-jc-cen l-ai-cen l-fg-1' basic color='green' inverted>
+    <Container
+      className='l-d-f l-fd-col'
+    >
+      <Segment
+        className='
+          l-d-f
+          l-jc-cen
+          l-ai-cen
+          l-fg-1
+          '
+        basic
+        color='green'
+        inverted
+      >
         <div>
           <Statistic inverted>
             <Statistic.Label>Total Income</Statistic.Label>
@@ -54,6 +71,16 @@ const Home = () => {
         <ReactFinalForm onSubmit={onSetAmount}>
           {
             ({ handleSubmit, form }) => {
+              const {
+                values: {
+                  type,
+                  categoryType,
+                  categoryDescription,
+                  user
+                }
+              } = form.getState()
+
+              console.log(categoryType, 'categoryType')
               return (
                 <form onSubmit={handleSubmit}>
                   <div className='l-d-f l-js-sb'>
@@ -66,9 +93,13 @@ const Home = () => {
                             color='green'
                             disabled={pristine}
                             icon='add circle'
-                            onClick={() => form.change('type', 'income')}
+                            onClick={() => {
+                              form.change('type', 'income')
+                              setIsAuthorised(true)
+                              setShowCategoryModal(true)
+                            }}
                             size='massive'
-                            type='submit'
+                            type='button'
                           />
                         )
                       }
@@ -94,9 +125,13 @@ const Home = () => {
                             color='red'
                             disabled={pristine}
                             icon='minus'
-                            onClick={() => form.change('type', 'expense')}
+                            onClick={() => {
+                              form.change('type', 'expense')
+                              form.change('categoryType', 'expense')
+                              setShowCategoryModal(true)
+                            }}
                             size='massive'
-                            type='submit'
+                            type='button'
                           />
                         )
                       }
@@ -108,6 +143,107 @@ const Home = () => {
                       }}
                     />
                   </div>
+                  <Modal
+                    open={showCategoryModal}
+                    size='small'
+                    onClose={() => {
+                      setShowCategoryModal(false)
+                      form.reset()
+                    }}
+                  >
+                    <Modal.Content>
+                      <ul className='l-pl0 l-pr0 l-lst-n'>
+                        {
+                          type === 'income' &&
+                            <li>
+                              <Field name='categoryType'>
+                                {
+                                  ({ input }) => (
+                                    <select className='l-w-100' {...input}>
+                                      <option />
+                                      <option value='sponsor'>
+                                        Sponsor
+                                      </option>
+                                      <option value='contribution-student'>
+                                        Contribution - Student
+                                      </option>
+                                      <option value='contribution-eca'>
+                                        Contribution - Extra Curricular Activity
+                                      </option>
+                                    </select>
+                                  )
+                                }
+                              </Field>
+                            </li>
+                        }
+                        <li className='l-pt1'>
+                          <Field name='categoryDescription'>
+                            {
+                              ({ input }) => (
+                                <input
+                                  className='l-w-100'
+                                  placeholder='description' {...input}
+                                />
+                              )
+                            }
+                          </Field>
+                        </li>
+                        <li className='l-pt1'>
+                          <Field name='user'>
+                            {
+                              ({ input }) => (
+                                <input
+                                  className='l-w-100'
+                                  placeholder='user' {...input}
+                                />
+                              )
+                            }
+                          </Field>
+                        </li>
+                        {
+                          type === 'expense' &&
+                            <li className='l-d-f l-jc-cen'>
+                              <div className='l-d-f l-ai-cen l-pt1 l-pb1'>
+                                <input
+                                  type='checkbox'
+                                  checked={isAuthorised}
+                                  onChange={() =>
+                                    setIsAuthorised(prevState => !prevState)}
+                                />
+                                <span className='l-pl1'>
+                                  Authorized
+                                </span>
+                              </div>
+                            </li>
+                        }
+                        {
+                          isAuthorised && type === 'expense' &&
+                            <Message negative>
+                              <p>
+                                Make sure this expense if approved by authorised personel
+                              </p>
+                            </Message>
+                        }
+                        <li className='l-d-f l-jc-cen l-pt1'>
+                          <Button
+                            disabled={
+                              !isAuthorised ||
+                              !categoryType ||
+                              !categoryDescription ||
+                              !user
+                            }
+                            onClick={() => {
+                              setShowCategoryModal(false)
+                              form.change('date', dayjs().toISOString())
+                              form.submit()
+                            }}
+                          >
+                            Submit
+                          </Button>
+                        </li>
+                      </ul>
+                    </Modal.Content>
+                  </Modal>
                 </form>
               )
             }
