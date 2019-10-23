@@ -13,7 +13,7 @@ const MainNav = () => {
   return (
     <Container className='l-d-b'>
       <div className='l-pa1 header'>
-        <Header as='h1' inverted>PUP Piggy Budget</Header>
+        <Header as='h1' inverted>SBMS</Header>
       </div>
       <div className='l-pa1 sub-menu'>
         <Menu secondary inverted>
