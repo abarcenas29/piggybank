@@ -18,10 +18,7 @@ const History = () => {
       expense: getTotalExpenseSelector()
     })
   )
-  const data = [
-    { title: 'Income', value: income, color: 'green' },
-    { title: 'Expense', value: expense, color: 'red' }
-  ]
+
   return (
     <div className='l-pa1 l-d-f l-fd-col'>
       <div>
