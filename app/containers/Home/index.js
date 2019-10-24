@@ -80,7 +80,6 @@ const Home = () => {
                 }
               } = form.getState()
 
-              console.log(categoryType, 'categoryType')
               return (
                 <form onSubmit={handleSubmit}>
                   <div className='l-d-f l-js-sb'>
