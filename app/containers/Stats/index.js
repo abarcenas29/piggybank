@@ -1,5 +1,4 @@
 import React from 'react'
-import PieChart from 'react-minimal-pie-chart'
 import { useSelector } from 'react-redux'
 import { createStructuredSelector } from 'reselect'
 
