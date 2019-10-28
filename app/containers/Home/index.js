@@ -2,32 +2,25 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import dayjs from 'dayjs'
 import { createStructuredSelector } from 'reselect'
-import { Form as ReactFinalForm, Field, FormSpy } from 'react-final-form'
+import { Form as ReactFinalForm, FormSpy } from 'react-final-form'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   Button,
+  Form,
   Segment,
   Statistic,
-  Modal,
-  Message
+  Modal
 } from 'semantic-ui-react'
 
 import {
   ADD_ITEM_ACTION
 } from 'App/appReducer'
+import BudgetForm from 'Components/BudgetForm'
 
 import { getTotalIncomeSelector, getTotalExpenseSelector } from './selectors'
 
 const Container = styled.div`
   height: 100%;
-`
-const Input = styled.input`
-  border-bottom: 1px solid rgba(0,0,0,0.3);
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid #000;
-  outline: none;
-  font-size: 1.5rem;
 `
 
 const Home = () => {
@@ -73,68 +66,44 @@ const Home = () => {
             ({ handleSubmit, form }) => {
               const {
                 values: {
-                  type,
-                  categoryType,
                   categoryDescription,
+                  categoryType,
+                  recieptNo,
+                  type,
+                  unitPrice,
+                  unitQty,
                   user
                 }
               } = form.getState()
 
               return (
-                <form onSubmit={handleSubmit}>
+                <Form onSubmit={handleSubmit}>
                   <div className='l-d-f l-js-sb'>
-                    <FormSpy subscription={{ pristine: true }}>
-                      {
-                        ({ pristine }) => (
-                          <Button
-                            circular
-                            className='l-pa5'
-                            color='green'
-                            disabled={pristine}
-                            icon='add circle'
-                            onClick={() => {
-                              form.change('type', 'income')
-                              setIsAuthorised(true)
-                              setShowCategoryModal(true)
-                            }}
-                            size='massive'
-                            type='button'
-                          />
-                        )
-                      }
-                    </FormSpy>
-                    <Field
-                      name='budget'
-                    >
-                      {
-                        ({ input }) => (
-                          <Input
-                            type='number'
-                            className='f-center'
-                            {...input}
-                          />
-                        )
-                      }
-                    </Field>
-                    <FormSpy subscription={{ pristine: true }}>
-                      {
-                        ({ pristine }) => (
-                          <Button
-                            circular
-                            color='red'
-                            disabled={pristine}
-                            icon='minus'
-                            onClick={() => {
-                              form.change('type', 'expense')
-                              form.change('categoryType', 'expense')
-                              setShowCategoryModal(true)
-                            }}
-                            size='massive'
-                            type='button'
-                          />
-                        )
-                      }
-                    </FormSpy>
+                    <Button
+                      circular
+                      className='l-pa5'
+                      color='green'
+                      icon='add circle'
+                      onClick={() => {
+                        form.change('type', 'income')
+                        setIsAuthorised(true)
+                        setShowCategoryModal(true)
+                      }}
+                      size='massive'
+                      type='button'
+                    />
+                    <Button
+                      circular
+                      color='red'
+                      icon='minus'
+                      onClick={() => {
+                        form.change('type', 'expense')
+                        form.change('categoryType', 'expense')
+                        setShowCategoryModal(true)
+                      }}
+                      size='massive'
+                      type='button'
+                    />
                     <FormSpy
                       subscription={{ submitSucceeded: true }}
                       onChange={({ submitSucceeded }) => {
@@ -151,99 +120,39 @@ const Home = () => {
                     }}
                   >
                     <Modal.Content>
-                      <ul className='l-pl0 l-pr0 l-lst-n'>
-                        {
-                          type === 'income' &&
-                            <li>
-                              <Field name='categoryType'>
-                                {
-                                  ({ input }) => (
-                                    <select className='l-w-100' {...input}>
-                                      <option />
-                                      <option value='sponsor'>
-                                        Sponsor
-                                      </option>
-                                      <option value='contribution-student'>
-                                        Contribution - Student
-                                      </option>
-                                      <option value='contribution-eca'>
-                                        Contribution - Extra Curricular Activity
-                                      </option>
-                                    </select>
-                                  )
-                                }
-                              </Field>
-                            </li>
-                        }
-                        <li className='l-pt1'>
-                          <Field name='categoryDescription'>
-                            {
-                              ({ input }) => (
-                                <input
-                                  className='l-w-100'
-                                  placeholder='description' {...input}
-                                />
-                              )
-                            }
-                          </Field>
-                        </li>
-                        <li className='l-pt1'>
-                          <Field name='user'>
-                            {
-                              ({ input }) => (
-                                <input
-                                  className='l-w-100'
-                                  placeholder='user' {...input}
-                                />
-                              )
-                            }
-                          </Field>
-                        </li>
-                        {
-                          type === 'expense' &&
-                            <li className='l-d-f l-jc-cen'>
-                              <div className='l-d-f l-ai-cen l-pt1 l-pb1'>
-                                <input
-                                  type='checkbox'
-                                  checked={isAuthorised}
-                                  onChange={() =>
-                                    setIsAuthorised(prevState => !prevState)}
-                                />
-                                <span className='l-pl1'>
-                                  Authorized
-                                </span>
-                              </div>
-                            </li>
-                        }
-                        {
-                          isAuthorised && type === 'expense' &&
-                            <Message negative>
-                              <p>
-                                Make sure this expense if approved by authorised personel
-                              </p>
-                            </Message>
-                        }
-                        <li className='l-d-f l-jc-cen l-pt1'>
+                      <Form>
+                        <BudgetForm
+                          isAuthorised={isAuthorised}
+                          setIsAuthorised={setIsAuthorised}
+                          type={type}
+                          unitPrice={unitPrice}
+                          unitQty={unitQty}
+                        />
+                        <Form.Field className='l-d-f l-jc-cen'>
                           <Button
                             disabled={
                               !isAuthorised ||
                               !categoryType ||
                               !categoryDescription ||
+                              !unitPrice ||
+                              !unitQty ||
+                              !recieptNo ||
                               !user
                             }
                             onClick={() => {
                               setShowCategoryModal(false)
+                              setIsAuthorised(false)
                               form.change('date', dayjs().toISOString())
                               form.submit()
                             }}
                           >
                             Submit
                           </Button>
-                        </li>
-                      </ul>
+                        </Form.Field>
+                      </Form>
                     </Modal.Content>
                   </Modal>
-                </form>
+                </Form>
               )
             }
           }
